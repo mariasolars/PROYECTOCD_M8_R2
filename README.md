@@ -3,7 +3,7 @@ Repositorio para el reto 2 del módulo 8 del Máster en Behavioral Data Science.
 
 ## Objetivos del proyecto
 
-El objetivo general del presente proyecto de ciencia de datos comportamentales es examinar **las relaciones entre variables demográficas (edad, género, años de educación formal y país) y el comportamiento relacionado con el uso de medios (tiempo dedicado a las noticias y política, frecuencia de uso de Internet y tiempo de uso de Internet)**, para comprender mejor el comportamiento de los usuarios de medios digitales y de cominicación en función de sus características demográficas.
+El objetivo general del presente proyecto de ciencia de datos comportamentales es examinar **las relaciones entre variables demográficas (edad, género, años de educación formal y país) y el comportamiento relacionado con el uso de medios (tiempo dedicado a las noticias y política, frecuencia de uso de Internet y tiempo de uso de Internet)**, para comprender mejor el comportamiento de los usuarios de medios digitales y de comunicación en función de sus características demográficas.
 
 De forma más específica, los objetivos concretos del poryecto son los siguientes:
 
