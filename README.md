@@ -1,9 +1,9 @@
 # PROYECTOCD_M8_R2
-Repositorio para el reto 2 del módulo 8 del Máster en Behavioral Data Science
+Repositorio para el reto 2 del módulo 8 del Máster en Behavioral Data Science.
 
 ## Objetivos del proyecto
 
-El objetivo general del presente proyecto de ciencia de datos comportamentales es examinar **las relaciones entre variables demográficas (edad, género, años de educación formal y país) y el comportamiento relacionado con el uso de medios (tiempo dedicado a las noticias y política, frecuencia de uso de Internet y tiempo de uso de Internet)**, para comprender mejor el comportamiento de los usuarios de medios en función de sus características demográficas.
+El objetivo general del presente proyecto de ciencia de datos comportamentales es examinar **las relaciones entre variables demográficas (edad, género, años de educación formal y país) y el comportamiento relacionado con el uso de medios (tiempo dedicado a las noticias y política, frecuencia de uso de Internet y tiempo de uso de Internet)**, para comprender mejor el comportamiento de los usuarios de medios digitales y de cominicación en función de sus características demográficas.
 
 De forma más específica, los objetivos concretos del poryecto son los siguientes:
 
@@ -21,19 +21,19 @@ Para este proyecto, se trabajará con siete variables incluidas en la base de da
 
 ## Descripción de las variables del proyecto
 
-* **Edad (agea):** Esta variable numérica se refiere a la edad de la persona encuestada, expresada en años, con un rango de valores desde 15 hasta 90 años.
+* **Edad (*agea*):** esta variable numérica se refiere a la edad de la persona encuestada, expresada en años, con un rango de valores desde 15 hasta 90 años.
 
-* **Género (gndr):** Esta variable se refiere al género de la persona encuestada. Es un dato de tipo categórico nominal y su codificación numérica abarca dos valores: 1 (Varón) y 2 (Mujer).
+* **Género (*gndr*):** esta variable se refiere al género de la persona encuestada. Es un dato de tipo categórico nominal y su codificación numérica abarca dos valores: 1 (Varón) y 2 (Mujer).
 
-* **Años de educación completados (eduyrs):** Esta variable numérica se refiere al número de años de educación formal que ha completado la persona encuestada, con un rango de valores desde 0 hasta 47.
+* **Años de educación completados (*eduyrs*):** esta variable numérica se refiere al número de años de educación formal que ha completado la persona encuestada, con un rango de valores desde 0 hasta 47.
 
-* **País (cntry):** Esta variable se refiere al país de origen de la persona encuestada. Es un dato de tipo categórico nominal y abarca 13 valores de tipo carácter: AT (Austria), CH (Suiza), DE (Alemania), FI (Finlandia), GB (Reino Unido), HR (Croacia), HU (Hungría), IE (Irlanda), LT (Lituania), NL (Países Bajos), NO (Noruega), SI (Eslovenia) y SK (Eslovaquia).
+* **País (*cntry*):** esta variable se refiere al país de origen de la persona encuestada. Es un dato de tipo categórico nominal y abarca 13 valores de tipo carácter: AT (Austria), CH (Suiza), DE (Alemania), FI (Finlandia), GB (Reino Unido), HR (Croacia), HU (Hungría), IE (Irlanda), LT (Lituania), NL (Países Bajos), NO (Noruega), SI (Eslovenia) y SK (Eslovaquia).
 
-* **Tiempo dedicado a las noticias y la política (nwspol):** Esta variable numérica se refiere al tiempo que dedica la persona encuestada a ver, leer o escuchar noticias sobre la actualidad o la política en un día, expresado en minutos, con un rango de valores desde 0 hasta 1439 minutos.
+* **Tiempo dedicado a las noticias y la política (*nwspol*):** esta variable numérica se refiere al tiempo que dedica la persona encuestada a ver, leer o escuchar noticias sobre la actualidad o la política en un día, expresado en minutos, con un rango de valores desde 0 hasta 1439 minutos.
 
-* **Frecuencia de uso de internet (netusoft):** Esta variable se refiere a la frecuencia habitual con que la persona encuestada utiliza Internet. Es un dato de tipo categórico ordinal y abarca 5 valores, en una escala ordinal de frecuencia, que va desde 1 (Nunca) hasta 5 (Todos los días).
+* **Frecuencia de uso de internet (*netusoft*):** esta variable se refiere a la frecuencia habitual con que la persona encuestada utiliza Internet. Es un dato de tipo categórico ordinal y abarca 5 valores, en una escala ordinal de frecuencia, que va desde 1 (Nunca) hasta 5 (Todos los días).
 
-* **Tiempo de uso de Internet (netustm):** Esta variable numérica se refiere al tiempo que dedica la persona encuestada al uso de Internet en un día, expresado en minutos, con un rango de valores desde 0 hasta 1440.
+* **Tiempo de uso de Internet (*netustm*):** esta variable numérica se refiere al tiempo que dedica la persona encuestada al uso de Internet en un día, expresado en minutos, con un rango de valores desde 0 hasta 1440.
 
 ## Información sobre el repositorio
 
@@ -49,7 +49,7 @@ Este repositoriose organiza del siguiente modo:
 
 ## Información adicional
 
-Todos los análisis han sido realizados utilizando R:
+Todos los análisis, informes y visualizaciones han sido realizados utilizando el *software* estadístico R. Los detalles del programa son los siguientes:
 
 ```R
 platform       x86_64-w64-mingw32               
