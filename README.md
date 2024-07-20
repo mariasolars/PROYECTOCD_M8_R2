@@ -21,19 +21,19 @@ Para este proyecto, se trabajará con siete variables incluidas en la base de da
 
 ## Descripción de las variables del proyecto
 
-* **Edad (agea): **Esta variable numérica se refiere a la edad de la persona encuestada, expresada en años, con un rango de valores desde 15 hasta 90 años.
+* **Edad (agea):** Esta variable numérica se refiere a la edad de la persona encuestada, expresada en años, con un rango de valores desde 15 hasta 90 años.
 
-* **Género (gndr): **Esta variable se refiere al género de la persona encuestada. Es un dato de tipo categórico nominal y su codificación numérica abarca dos valores: 1 (Varón) y 2 (Mujer).
+* **Género (gndr):** Esta variable se refiere al género de la persona encuestada. Es un dato de tipo categórico nominal y su codificación numérica abarca dos valores: 1 (Varón) y 2 (Mujer).
 
-* **Años de educación completados (eduyrs): **Esta variable numérica se refiere al número de años de educación formal que ha completado la persona encuestada, con un rango de valores desde 0 hasta 47.
+* **Años de educación completados (eduyrs):** Esta variable numérica se refiere al número de años de educación formal que ha completado la persona encuestada, con un rango de valores desde 0 hasta 47.
 
-* **País (cntry): **Esta variable se refiere al país de origen de la persona encuestada. Es un dato de tipo categórico nominal y abarca 13 valores de tipo carácter: AT (Austria), CH (Suiza), DE (Alemania), FI (Finlandia), GB (Reino Unido), HR (Croacia), HU (Hungría), IE (Irlanda), LT (Lituania), NL (Países Bajos), NO (Noruega), SI (Eslovenia) y SK (Eslovaquia).
+* **País (cntry):** Esta variable se refiere al país de origen de la persona encuestada. Es un dato de tipo categórico nominal y abarca 13 valores de tipo carácter: AT (Austria), CH (Suiza), DE (Alemania), FI (Finlandia), GB (Reino Unido), HR (Croacia), HU (Hungría), IE (Irlanda), LT (Lituania), NL (Países Bajos), NO (Noruega), SI (Eslovenia) y SK (Eslovaquia).
 
-* **Tiempo dedicado a las noticias y la política (nwspol): **Esta variable numérica se refiere al tiempo que dedica la persona encuestada a ver, leer o escuchar noticias sobre la actualidad o la política en un día, expresado en minutos, con un rango de valores desde 0 hasta 1439 minutos.
+* **Tiempo dedicado a las noticias y la política (nwspol):** Esta variable numérica se refiere al tiempo que dedica la persona encuestada a ver, leer o escuchar noticias sobre la actualidad o la política en un día, expresado en minutos, con un rango de valores desde 0 hasta 1439 minutos.
 
-* **Frecuencia de uso de internet (netusoft): **Esta variable se refiere a la frecuencia habitual con que la persona encuestada utiliza Internet. Es un dato de tipo categórico ordinal y abarca 5 valores, en una escala ordinal de frecuencia, que va desde 1 (Nunca) hasta 5 (Todos los días).
+* **Frecuencia de uso de internet (netusoft):** Esta variable se refiere a la frecuencia habitual con que la persona encuestada utiliza Internet. Es un dato de tipo categórico ordinal y abarca 5 valores, en una escala ordinal de frecuencia, que va desde 1 (Nunca) hasta 5 (Todos los días).
 
-* **Tiempo de uso de Internet (netustm): **Esta variable numérica se refiere al tiempo que dedica la persona encuestada al uso de Internet en un día, expresado en minutos, con un rango de valores desde 0 hasta 1440.
+* **Tiempo de uso de Internet (netustm):** Esta variable numérica se refiere al tiempo que dedica la persona encuestada al uso de Internet en un día, expresado en minutos, con un rango de valores desde 0 hasta 1440.
 
 ## Información sobre el repositorio
 
@@ -41,11 +41,11 @@ Este repositoriose organiza del siguiente modo:
 
 * **Datos:** contiene la base de datos original (ESS11.csv), así como la base de datos depurada (ESS11 depurada.csv) y el código para llevar a cabo la depuración de la base original.
 
-* **Dashboard:** contiene el código necesario para realizar un *dasboard* con la visualización de 
+* **Dashboard:** contiene el código necesario para realizar un *dashboard* con la visualización de los gráficos y datos para estudiar las relaciones entre las variables, así como el HTML con el *dashboard* generado con dicho código.
 
-* **Informe:** 
+* **Informe:** contiene el código necesario para realizar un informe con los resultados de las relaciones entre las variables estudiadas en el proyecto, así como el PDF del informe generado con dicho código.
 
-* **Presentación:** 
+* **Presentación:** contiene el código necesario para realizar una presentación con los resultados de las relaciones entre las variables estudiadas en el proyecto, así como el PDF de la presentación generada con dicho código.
 
 ## Información adicional
 
