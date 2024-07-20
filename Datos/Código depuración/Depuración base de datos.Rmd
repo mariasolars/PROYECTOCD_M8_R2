@@ -1,0 +1,247 @@
+---
+title: "Depuración de la base original"
+author: "María Solar"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    number_sections: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.width = 10, fig.height = 10)
+```
+
+# Carga de paquetes
+
+```{r results='hide', warning=FALSE}
+if(!require(knitr)) {install.packages("knitr")
+  library(knitr)}
+if(!require(dplyr)) {install.packages("dplyr")
+  library(dplyr)}
+if(!require(ggplot2)) {install.packages("ggplot2")
+  library(ggplot2)}
+if(!require(waffle)) {install.packages("waffle")
+  library(waffle)}
+```
+
+# Carga de datos originales
+
+```{r}
+datos <- as.data.frame(read.csv("ESS11.csv", header = T, sep = ",", dec = "."))
+
+##Selección de las variables de interés
+datos <- select(datos, all_of(c("agea", "gndr", "eduyrs", "cntry", "nwspol", "netusoft", "netustm")))
+
+# Estructura de la base
+str(datos)
+```
+
+## Recodificación de variables al tipo de datos
+
+```{r}
+#Codificación de variables nominales a factores
+datos$cntry <- factor(datos$cntry, levels = c("AT", "CH", "DE", "FI", "GB", "HR", "HU", "IE", "LT", "NL", "NO", "SI", "SK"), labels = c("Austria", "Suiza", "Alemania", "Finlandia", "Reino Unido", "Croacia", "Hungría", "Irlanda", "Lituania", "Países Bajos", "Noruega", "Eslovenia", "Eslovaquia"))
+
+datos$gndr <- factor(datos$gndr, levels = c(1,2), labels = c("Varón", "Mujer"))
+
+#Conversión a variables numéricas
+for(i in 1:7){
+  if(i == 2 | i == 4){
+    next
+  }else{
+    datos[,i] <- as.numeric(datos[,i])
+  }
+}
+
+print(as.data.frame(head(datos)))
+```
+
+## Inspección de datos
+### Tablas de frecuencias
+
+```{r}
+for (i in 1:length(datos[1,])) {
+  frec_table <- table(datos[,i])
+  print(paste("Tabla de frecuencias para", colnames(datos)[i]))
+  print(frec_table)
+}
+```
+
+### Gráficos
+
+```{r}
+# Género
+data_gndr <- datos %>%
+  count(gndr) %>%
+  mutate(prop = n / sum(n) * 100,
+         paste(gndr, " = ", round(prop, 1), "%"))  # Crear etiquetas con los porcentajes
+
+waffle_gndr <- waffle(
+  data_gndr[,c(4,3)], # Proporciones en porcentaje
+  rows = 9,                # Número de filas
+  colors = c("skyblue", "plum2"),
+  title = "Distribución de género (gndr)")
+
+print(waffle_gndr + theme(plot.title = element_text(color = "darkgrey", size = 12, face = "italic")))
+
+# Edad
+### Función para crear boxplots
+create_boxplot <- function(data, variable, title, x_label, y_label, color) {
+  ggplot(data, aes(y = !!sym(variable))) +
+    geom_boxplot(fill = color, color = "black") +
+    labs(title = title, x = x_label, y = y_label) +
+    theme_minimal() +
+    theme(
+      plot.title = element_text(hjust = 0, size = 12, face = "italic", color = "darkgrey"),
+      axis.title = element_text(size = 12),
+      axis.text = element_text(size = 10),
+      panel.grid.major = element_blank(),  # Elimina las líneas de la cuadrícula mayor
+      panel.grid.minor = element_blank(),  # Elimina las líneas de la cuadrícula menor
+      axis.line = element_line(color = "black"),  # Añade líneas en los ejes
+      axis.text.x = element_blank(),  # Elimina las unidades del eje x
+      axis.ticks.x = element_blank()  # Elimina las marcas del eje x
+    )
+}
+
+boxplot_agea <- create_boxplot(datos, "agea", "Boxplot de edad (agea)", "", "Edad (años)","skyblue")
+print(boxplot_agea)
+
+# Años de educación
+boxplot_eduyrs <- create_boxplot(datos, "eduyrs", "Boxplot de Años de educación (eduyrs)", "", "Años de educación", "seagreen")
+print(boxplot_eduyrs)
+
+# País
+# Calcular frecuencias de cada país y porcentaje
+data_cntry <- datos %>%
+  count(cntry) %>%
+  mutate(prop = n / sum(n) * 100,
+         label = paste(cntry, " = ", round(prop, 1), "%"))
+
+# Crear gráfico de waffle
+waffle_cntry <- waffle(
+  data_cntry[,c(4,3)], # Proporciones en porcentaje
+  rows = 5,                # Número de filas
+  colors = c("#FF9999", "#66B2FF", "grey", "orange", "#FF99CC", "#CC99FF", 
+             "#FF6666", "#99CCCC", "#CCFF99", "#CCCCFF", "yellow", "#FF66B2", "#66FF66"),
+  title = "Distribución de países (cntry)",
+  legend_pos = "bottom"
+)
+
+print(waffle_cntry + theme(plot.title = element_text(color = "darkgrey", size = 12, face = "italic")))
+
+# Frecuencia Internet
+boxplot_netusoft <- create_boxplot(datos, "netusoft", "Boxplot de Frecuencia de uso de internet (netusoft)", "", "Frecuencia", "dodgerblue")
+print(boxplot_netusoft)
+
+# Tiempo Internet
+boxplot_netustm <- create_boxplot(datos, "netustm", "Boxplot de Tiempo de uso de internet (netustm)", "", "Tiempo (minutos)", "gold")
+print(boxplot_netustm)
+
+# Tiempo noticias
+boxplot_nwspol <- create_boxplot(datos, "nwspol", "Boxplot de Frecuencia de noticias políticas (nwspol)", "", "Tiempo (minutos)", "tomato3")
+print(boxplot_nwspol)
+```
+
+# Creación de la base de datos depurada
+## Recodificicación de valores perdidos
+```{r}
+datos$agea[datos$agea == 777 | datos$agea == 888 | datos$agea == 999] <- NA
+datos$eduyrs[datos$eduyrs == 77 | datos$eduyrs == 88 | datos$eduyrs == 99] <- NA
+datos$nwspol[datos$nwspol == 7777 | datos$nwspol == 8888 | datos$nwspol == 9999] <- NA
+datos$netusoft[datos$netusoft == 7 | datos$netusoft == 8 | datos$netusoft == 9] <- NA
+datos$netustm[datos$netustm == 6666 | datos$netustm == 7777 | datos$netustm == 8888 | datos$netustm == 9999] <- NA
+```
+
+## Eliminación de valores perdidos
+
+```{r}
+for (i in 1:length(datos[1,])){
+  print(paste("Resumen para la variable", colnames(datos)[i]))
+  print(summary(datos[,i]))
+}
+
+datosdep <- datos[is.na(datos$agea) == F & is.na(datos$eduyrs) == F & is.na(datos$nwspol) == F & is.na(datos$netusoft) == F & is.na(datos$netustm) == F,]
+
+for (i in 1:length(datosdep[1,])){
+  print(paste("Resumen para la variable", colnames(datos)[i]))
+  print(summary(datosdep[,i]))
+}
+
+```
+
+## Inspección de las variables
+### Tablas de frecuencias
+
+```{r}
+for (i in 1:length(datosdep[1,])) {
+  frec_table <- table(datosdep[,i])
+  print(paste("Tabla de frecuencias para", colnames(datosdep)[i]))
+  print(frec_table)
+}
+```
+
+### Gráficos
+
+```{r}
+# Género
+data_gndr <- datosdep %>%
+  count(gndr) %>%
+  mutate(prop = n / sum(n) * 100,
+         paste(gndr, " = ", round(prop, 1), "%"))  # Crear etiquetas con los porcentajes
+
+waffle_gndr <- waffle(
+  data_gndr[,c(4,3)], # Proporciones en porcentaje
+  rows = 9,                # Número de filas
+  colors = c("skyblue", "plum2"),
+  title = "Distribución de género (gndr)")
+
+print(waffle_gndr + theme(plot.title = element_text(color = "darkgrey", size = 12, face = "italic")))
+
+# Edad
+boxplot_agea <- create_boxplot(datosdep, "agea", "Boxplot de edad (agea)", "", "Edad (años)","skyblue")
+print(boxplot_agea)
+
+# Años de educación
+boxplot_eduyrs <- create_boxplot(datosdep, "eduyrs", "Boxplot de Años de educación (eduyrs)", "", "Años de educación", "seagreen")
+print(boxplot_eduyrs)
+
+# País
+# Calcular frecuencias de cada país y porcentaje
+data_cntry <- datosdep %>%
+  count(cntry) %>%
+  mutate(prop = n / sum(n) * 100,
+         label = paste(cntry, " = ", round(prop, 1), "%"))
+
+# Crear gráfico de waffle
+waffle_cntry <- waffle(
+  data_cntry[,c(4,3)], # Proporciones en porcentaje
+  rows = 5,                # Número de filas
+  colors = c("#FF9999", "#66B2FF", "grey", "orange", "#FF99CC", "#CC99FF", 
+             "#FF6666", "#99CCCC", "#CCFF99", "#CCCCFF", "yellow", "#FF66B2", "#66FF66"),
+  title = "Distribución de países (cntry)",
+  legend_pos = "bottom"
+)
+
+print(waffle_cntry + theme(plot.title = element_text(color = "darkgrey", size = 12, face = "italic")))
+
+# Frecuencia Internet
+boxplot_netusoft <- create_boxplot(datosdep, "netusoft", "Boxplot de Frecuencia de uso de internet (netusoft)", "", "Frecuencia", "dodgerblue")
+print(boxplot_netusoft)
+
+# Tiempo Internet
+boxplot_netustm <- create_boxplot(datosdep, "netustm", "Boxplot de Tiempo de uso de internet (netustm)", "", "Tiempo (minutos)", "gold")
+print(boxplot_netustm)
+
+# Tiempo noticias
+boxplot_nwspol <- create_boxplot(datosdep, "nwspol", "Boxplot de Frecuencia de noticias políticas (nwspol)", "", "Tiempo (minutos)", "tomato3")
+print(boxplot_nwspol)
+```
+
+# Guardar base de datos depurada
+
+```{r}
+write.csv(datosdep, "ESS11 depurada.csv", col.names = T, row.names = F)
+```
+
