@@ -1,0 +1,400 @@
+<<echo=FALSE>>=
+# Carga de paquetes
+if(!require(tinytex)) {install.packages("tinytex")
+  library(tinytex)}
+if(!require(knitr)) {install.packages("knitr")
+  library(knitr)}
+if(!require(dplyr)) {install.packages("dplyr")
+  library(dplyr)}
+if(!require(ggplot2)) {install.packages("ggplot2")
+  library(ggplot2)}
+if(!require(doBy)) {install.packages("doBy")
+  library(doBy)}
+if(!require(Hmisc)) {install.packages("Hmisc")
+  library(Hmisc)}
+if(!require(corrplot)) {install.packages("corrplot")
+  library(corrplot)}
+@
+
+\documentclass{beamer}
+
+\usetheme{Pittsburgh}
+\usecolortheme{seahorse}
+\usefonttheme{structurebold}
+
+\usepackage[spanish]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=red,
+    urlcolor=blue,
+}
+
+
+\title{Presentación de resultados del estudio de uso de medios de la ESS 11}
+\author{María Solar Sastre}
+\date{\Sexpr{format(Sys.Date(), "%d %B, %Y")}}
+\addto\captionsspanish{\renewcommand{\tablename}{Tabla}}
+\renewcommand{\figurename}{Figura}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+\begin{frame}
+\maketitle
+\end{frame}
+
+\begin{frame}
+\frametitle{Índice}
+\tableofcontents
+\end{frame}
+
+\section{Introducción}
+\begin{frame}
+\frametitle{Introducción}
+\framesubtitle{¿Qué es la ESS?}
+
+La Encuesta Social Europea (ESS) es un proyecto de investigación con el objetivo es recopilar datos sobre las actitudes, creencias y comportamientos de la población en Europa.
+
+En 2023, se publicó la \href{https://ess.sikt.no/en/study/412db4fe-c77a-4e98-8ea4-6c19007f551b/83}{\textbf{11.ª oleada de la ESS}}. Se recogieron datos de 13 países europeos, en un total de 558 \href{https://ess.sikt.no/en/datafile/242aaa39-3bbb-40f5-98bf-bfb1ce53d8ef/93?tab=0}{variables} que se agrupan en bloques de contenido:
+
+\begin{enumerate}
+\item \textit{Demografía}
+\item \textit{Bienestar}
+\item \textit{Política}
+\item \textit{Sociedad}
+\item \textit{Economía}
+\item \textit{Medio ambiente}
+\item \textit{Religión y moralidad}
+\item \textit{Medios de comunicación y tecnología}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{Introducción}
+\framesubtitle{Objetivos del estudio}
+
+Se utilizarán los datos de la 11.ª oleada de la ESS con el objetivo de \textbf{examinar las relaciones entre variables demográficas y el comportamiento relacionado con el uso de medios.}
+
+Los objetivos específicos son:
+\begin{itemize}
+\item{Estudiar las posibles diferencias en el uso de medios en función del género.}
+\item{Comprobar si existe una relación entre la edad y el tiempo y frecuencia de uso de medios.}
+\item{Estudiar la posible relación entre los años de educación formal completados y el uso de medios.}
+\item{Examinar si hay diferencias en el tiempo y frecuencia de uso de medios en distintos países europeos.}
+\end{itemize}
+\end{frame}
+
+\section{Método}
+\begin{frame}
+\frametitle{Método}
+\framesubtitle{Variables de estudio}
+Cuatro variables demográficas:
+\begin{itemize}
+\item \textbf{Edad} \emph{(agea)}: edad de la persona encuestada, expresada en años (desde 15 hasta 90 años).
+\item \textbf{Género} \emph{(gndr)}: género de la persona encuestada (Varón y Mujer).
+\item \textbf{Años de educación formal} \emph{(eduyrs)}: número de años de educación formal que ha completado la persona encuestada (desde 0 hasta 47 años).
+\item \textbf{País} \emph{(cntry)}: país de origen de la persona encuestada (Austria, Suiza, Alemania, Finlandia, Reino Unido, Croacia, Hungría, Irlanda, Lituania, Países Bajos, Noruega, Eslovenia y Eslovaquia).
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Método}
+\framesubtitle{Variables de estudio}
+Tres variables relacionadas con el uso de medios:
+\begin{itemize}
+\item \textbf{Tiempo dedicado a las noticias y la política} \emph{(nwspol)}: tiempo que dedica la persona encuestada a ver, leer o escuchar noticias sobre la actualidad o la política en un día, expresado en minutos (desde 0 hasta 1439 minutos).
+\item \textbf{Frecuencia de uso de Internet} \emph{(netusoft)}: frecuencia habitual con que la persona encuestada utiliza Internet (escala ordinal desde 1-Nunca hasta 5-Todos los días).
+\item \textbf{Tiempo de uso de Internet} \emph{(netustm)}: tiempo que dedica la persona encuestada al uso de Internet en un día, expresado en minutos (desde 0 hasta 1440 minutos).
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Método}
+\framesubtitle{Muestra}
+<<echo=FALSE>>=
+# Carga de datos
+datosr2 <- read.csv("ESS11 depurada.csv", header = TRUE, sep = ",", dec = ".")
+
+# Obtener n
+tamañomuestral <- nrow(datosr2)
+
+# Número de países
+países <- length(unique(datosr2$cntry))
+
+# Porcentajes género
+absolutasg <- table(datosr2$gndr)
+relativasg <- round(table(datosr2$gndr) / nrow(datosr2), 2) * 100
+
+# Media y Dt edad
+mediae <- round(mean(datosr2$agea), 2)
+dte <- round(sd(datosr2$agea), 2)
+
+# Media y Dt años educación
+mediaed <- round(mean(datosr2$eduyrs), 2)
+dted <- round(sd(datosr2$eduyrs), 2)
+@
+
+La muestra final está compuesta por \Sexpr{tamañomuestral} personas procedentes de \Sexpr{países} europeos. 
+\begin{itemize}
+\item \Sexpr{as.numeric(relativasg[1])} \% de mujeres; \Sexpr{as.numeric(relativasg[2])} \% de varones.
+\item Edad media = \Sexpr{mediae} años (Dt = \Sexpr{dte}).
+\item Media de años de educación completados = \Sexpr{mediaed} (Dt = \Sexpr{dted}).
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Método}
+\framesubtitle{Muestra}
+\begin{table}[ht]
+\centering
+\caption{Personas procedentes de cada país}
+\scriptsize
+\begin{tabular}{|l|c|}
+\hline
+\textbf{País} & \textbf{Número de personas} \\
+\hline
+Alemania & 2067 \\
+Austria & 1776 \\
+Croacia & 1052 \\
+Eslovaquia & 781 \\
+Eslovenia & 933 \\
+Finlandia & 1366 \\
+Hungría & 1379 \\
+Irlanda & 1527 \\
+Lituania & 972 \\
+Noruega & 1256 \\
+Países Bajos & 1563 \\
+Reino Unido & 1296 \\
+Suiza & 1203 \\
+\hline
+Total & 17171 \\
+\hline
+\end{tabular}
+\end{table}
+\end{frame}
+
+\section{Resultados}
+\subsection{Género}
+\begin{frame}
+\frametitle{Resutados}
+\framesubtitle{Género y uso de medios}
+<<echo=FALSE>>=
+#Comparación
+gnoticias <- wilcox.test(nwspol~gndr, datosr2)
+gfreci <- wilcox.test(netusoft~gndr, datosr2)
+gtinternet <- wilcox.test(netustm~gndr, datosr2)
+@
+
+Hay diferencias significativas según el género en el tiempo medio dedicado a las noticias y la política (\emph{U} = \Sexpr{round(gnoticias$statistic, 2)}, \emph{p} = \Sexpr{round(gnoticias$p.value, 3)}) y el tiempo de uso de Internet (\emph{U} = \Sexpr{round(gtinternet$statistic, 2)}, \emph{p} = \Sexpr{round(gtinternet$p.value, 3)}).
+
+<<echo=FALSE>>=
+#Medias
+gdes <-summaryBy(nwspol+netusoft+netustm ~ gndr,data=datosr2,FUN=c(mean,sd))
+gdes[,-c(1)] <- round(gdes[,-c(1)],2) 
+colnames(gdes) <- c("Género", "nwspol_media", "netusoft_media", "netustm_media", "nwspol_d", "netusoft_dt", "netustm_dt")
+#xtable(gdes, caption = "Descriptivos de uso de medios por género")
+@
+
+\begin{table}[ht]
+\centering
+\caption{Medias de las variables de uso de medios por género}
+\begin{tabular}{|l|ccc|}
+  \hline
+ Género & nwspol & netusoft & netustm \\ 
+  \hline
+Mujer & 87.10 & 4.91 & 226.96 \\ 
+Varón & 99.31 & 4.91 & 242.22 \\ 
+   \hline
+\end{tabular}
+\end{table}
+\end{frame}
+
+\subsection{Edad}
+\begin{frame}
+\frametitle{Resutados}
+\framesubtitle{Edad y uso de medios}
+
+\begin{figure}[ht]
+\centering
+\caption{\scriptsize Correlograma de la edad con el uso de medios}
+<<echo=FALSE,fig=true,width=1.2,height=0.87>>=
+#Correlaciones
+coredad <- rcorr(as.matrix(datosr2[,c(1,5:7)]), type = "spearman")
+
+#Correlograma
+rownames(coredad$P)<-rownames(coredad$r)
+colnames(coredad$P)<-colnames(coredad$r)
+
+corrplot(coredad$r, method="ellipse", col=colorRampPalette(c("dodgerblue3","white","red"))(10),
+         type="upper", order="original",p.mat=coredad$P,insig="blank",
+         addCoef.col = "black", # Add coefficient of correlation
+         tl.col="black", tl.srt=45, #Text label color and rotation
+         # hide correlation coefficient on the principal diagonal
+         cl.cex = 0.17, # Ajustar tamaño de las etiquetas de la leyenda
+         number.cex = 0.2, # Ajustar tamaño de los coeficientes
+         tl.cex = 0.17, # Ajustar tamaño de las etiquetas de las variable
+         diag=F,mar = c(0, 0, 0, 0))
+@
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Resutados}
+\framesubtitle{Edad y uso de medios}
+\begin{figure}[ht]
+\centering
+\caption{\scriptsize Diagrama de dispersión edad - tiempo de uso de Internet}
+<<echo=FALSE,fig=true,width=0.7,height=0.6>>=
+ggplot(datosr2, aes(x = agea, y = netustm, color = agea)) +
+  geom_point(size = 0.0001, alpha = 0.8, shape = 20) +  # Capa de puntos con tamaño personalizado
+  geom_smooth(method = "lm", se = FALSE, color = "blue", linewidth = 0.1) +  # Línea de regresión lineal sin intervalo de confianza
+  labs(x = "Edad", y = "Tiempo de uso de internet") +
+  scale_color_viridis_c(option = "magma") +  # Escala de color (puedes cambiar a la que prefieras)
+  theme_minimal() +  # Estilo del tema minimalista
+  theme(
+    panel.grid.major = element_blank(),  # Eliminar líneas de la cuadrícula principal
+    panel.grid.minor = element_blank(),  # Eliminar líneas de la cuadrícula secundaria
+    axis.line = element_line(color = "black", , linewidth = 0.05),  # Líneas de los ejes en negro
+    axis.ticks = element_line(color = "black", linewidth = 0.05),  # Color de las marcas de los ejes
+    axis.ticks.length = unit(0.2, "mm"),  # Longitud de las marcas de los ejes
+    axis.title = element_text(size = 1.25),  # Tamaño de las etiquetas de los ejes
+    axis.text = element_text(size = 1),  # Tamaño del texto de los ejes
+    legend.position = "none"
+  )
+@
+\end{figure}
+\end{frame}
+
+\subsection{Años de educación}
+\begin{frame}
+\frametitle{Resutados}
+\framesubtitle{Años de educación y uso de medios}
+\begin{figure}[ht]
+\centering
+\caption{\scriptsize Correlograma de los años de educación con el uso de medios}
+<<echo=FALSE,fig=true,width=1.2,height=0.87>>=
+#Correlaciones
+coredu <- rcorr(as.matrix(datosr2[,c(3,5:7)]), type = "spearman")
+
+#Correlograma
+rownames(coredu$P)<-rownames(coredu$r)
+colnames(coredu$P)<-colnames(coredu$r)
+
+corrplot(coredu$r, method="ellipse", col=colorRampPalette(c("dodgerblue3","white","red"))(10),
+         type="upper", order="original",p.mat=coredu$P,insig="blank",
+         addCoef.col = "black", # Add coefficient of correlation
+         tl.col="black", tl.srt=45, #Text label color and rotation
+         # hide correlation coefficient on the principal diagonal
+         cl.cex = 0.17, # Ajustar tamaño de las etiquetas de la leyenda
+         number.cex = 0.25, # Ajustar tamaño de los coeficientes
+         tl.cex = 0.17, # Ajustar tamaño de las etiquetas de las variable
+         diag=F,mar = c(0, 0, 0, 0))
+@
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Resutados}
+\framesubtitle{Años de educación y uso de medios}
+\begin{figure}[ht]
+\centering
+\caption{\scriptsize Diagrama de dispersión años de educación - tiempo de uso de Internet}
+<<echo=FALSE,fig=true,width=0.7,height=0.6>>=
+ggplot(datosr2, aes(x = eduyrs, y = netustm, color = eduyrs)) +
+  geom_point(size = 0.0001, alpha = 0.8, shape = 20) +  # Capa de puntos con tamaño personalizado
+  geom_smooth(method = "lm", se = FALSE, color = "blue", linewidth = 0.1) +  # Línea de regresión lineal sin intervalo de confianza
+  labs(x = "Años de educación", y = "Tiempo de uso de internet") +
+  scale_color_viridis_c(option = "magma") +  # Escala de color (puedes cambiar a la que prefieras)
+  theme_minimal() +  # Estilo del tema minimalista
+  theme(
+    panel.grid.major = element_blank(),  # Eliminar líneas de la cuadrícula principal
+    panel.grid.minor = element_blank(),  # Eliminar líneas de la cuadrícula secundaria
+    axis.line = element_line(color = "black", , linewidth = 0.05),  # Líneas de los ejes en negro
+    axis.ticks = element_line(color = "black", linewidth = 0.05),  # Color de las marcas de los ejes
+    axis.ticks.length = unit(0.2, "mm"),  # Longitud de las marcas de los ejes
+    axis.title = element_text(size = 1.25),  # Tamaño de las etiquetas de los ejes
+    axis.text = element_text(size = 1),  # Tamaño del texto de los ejes
+    legend.position = "none"
+  )
+@
+\end{figure}
+\end{frame}
+
+\subsection{País}
+\begin{frame}
+\frametitle{Resutados}
+\framesubtitle{País y uso de medios}
+<<echo=FALSE>>=
+#Comparación
+pnoticias <- kruskal.test(nwspol~cntry, datosr2)
+pfreci <- kruskal.test(netusoft~cntry, datosr2)
+ptinternet <- kruskal.test(netustm~cntry, datosr2)
+@
+
+Hay diferencias en el tiempo medio que dedican los distintos países a las noticias y la política (\emph{KW} = \Sexpr{round(pnoticias$statistic, 2)}, \emph{p} = \Sexpr{round(pnoticias$p.value, 3)}), así como en el tiempo (\emph{KW} = \Sexpr{round(ptinternet$statistic, 2)}, \emph{p} = \Sexpr{round(ptinternet$p.value, 3)}) y la frecuencia de uso de Internet (\emph{KW} = \Sexpr{round(pfreci$statistic, 2)}, \emph{p} = \Sexpr{round(pfreci$p.value, 3)}).
+
+<<echo=FALSE>>=
+#Medias
+pdes <-summaryBy(nwspol+netusoft+netustm ~ cntry,data=datosr2, FUN=c(mean,sd))
+pdes[,-c(1)] <- round(pdes[,-c(1)],2) 
+colnames(pdes) <- c("País", "nwspol_media", "netusoft_media", "netustm_media", "nwspol_dt", "netusoft_dt", "netustm_dt")
+#xtable(pdes, caption = "Descriptivos de uso de medios por país")
+@
+
+\begin{table}[ht]
+\centering
+\caption{Medias de las variables de uso de medios por país}
+\tiny
+\begin{tabular}{|l|ccc|}
+  \hline
+País & nwspol & netusoft & netustm \\ 
+  \hline
+Alemania & 232.21 & 4.93 & 232.33 \\ 
+Austria & 47.19 & 4.89 & 169.53 \\ 
+Croacia & 52.30 & 4.93 & 211.04 \\ 
+Eslovaquia & 94.04 & 4.83 & 205.57 \\ 
+Eslovenia & 43.95 & 4.94 & 202.12 \\ 
+Finlandia & 67.60 & 4.97 & 244.15 \\ 
+Hungría & 117.06 & 4.82 & 183.48 \\ 
+Irlanda & 78.10 & 4.86 & 233.54 \\ 
+Lituania & 102.95 & 4.86 & 265.32 \\ 
+Noruega & 76.45 & 4.94 & 297.08 \\ 
+Países Bajos & 70.91 & 4.95 & 274.88 \\ 
+Reino Unido & 84.89 & 4.90 & 294.01 \\ 
+Suiza & 59.31 & 4.92 & 235.67 \\ 
+   \hline
+\end{tabular}
+\end{table}
+\end{frame}
+
+\section{Conclusiones}
+\begin{frame}
+\frametitle{Conclusiones}
+\framesubtitle{Discusión de los resultados}
+Los resultados muestran que:
+\begin{itemize}
+\item Los varones dedican más tiempo a las noticias y a la política, así como al uso de Internet. No obstante, no hay diferencias de género en la frecuencia de uso de Internet.
+\item Cuanto mayor es la edad, mayor es el tiempo dedicado a las noticias y la política, pero menor es la frecuencia y tiempo de uso de Internet.
+\item Cuanto mayor es el número de años de educación completados, mayor es la frecuencia y tiempo de uso de medios.
+\item Hay diferencias en el tiempo y frecuencia de uso de medios en función del país.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Conclusiones}
+\framesubtitle{Conclusión final}
+Los resultados del estudio ponen de manifiesto que \textbf{existe una relación entre diferentes variables demográficas y el tiempo y frecuencia de uso de medios}.
+
+Por tanto, parece que las variables demográficas pueden jugar un papel importante a la hora de identificar patrones de consumo de noticias y uso de Internet y de comprender mejor el comportamiento de las personas usuarias.
+\end{frame}
+
+\begin{frame}
+\begin{center}
+\bf{\huge Muchas gracias por su atención}
+\end{center}
+\end{frame}
+
+\end{document}
