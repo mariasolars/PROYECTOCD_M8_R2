@@ -1,4 +1,30 @@
-<<echo=FALSE>>=
+\documentclass{beamer}
+
+\usetheme{Pittsburgh}
+\usecolortheme{seahorse}
+\usefonttheme{structurebold}
+
+\usepackage[spanish]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=red,
+    urlcolor=blue,
+}
+
+
+\title{Presentación de resultados del estudio de uso de medios de la ESS 11}
+\author{María Solar Sastre}
+\date{\Sexpr{format(Sys.Date(), "%d %B, %Y")}}
+\addto\captionsspanish{\renewcommand{\tablename}{Tabla}}
+\renewcommand{\figurename}{Figura}
+
+\begin{document}
+
+<<echo=FALSE,warning=FALSE,message=FALSE>>=
 # Carga de paquetes
 if(!require(tinytex)) {install.packages("tinytex")
   library(tinytex)}
@@ -15,32 +41,6 @@ if(!require(Hmisc)) {install.packages("Hmisc")
 if(!require(corrplot)) {install.packages("corrplot")
   library(corrplot)}
 @
-
-\documentclass{beamer}
-
-\usetheme{Pittsburgh}
-\usecolortheme{seahorse}
-\usefonttheme{structurebold}
-
-\usepackage[spanish]{babel}
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-\usepackage{hyperref}
-\hypersetup{
-    colorlinks=true,
-    linkcolor=red,
-    urlcolor=blue,
-}
-
-
-\title{Presentación de resultados del estudio de uso de medios de la ESS 11}
-\author{María Solar Sastre}
-\date{\Sexpr{format(Sys.Date(), "%d %B, %Y")}}
-\addto\captionsspanish{\renewcommand{\tablename}{Tabla}}
-\renewcommand{\figurename}{Figura}
-
-\begin{document}
-\SweaveOpts{concordance=TRUE}
 
 \begin{frame}
 \maketitle
@@ -114,7 +114,7 @@ Tres variables relacionadas con el uso de medios:
 \begin{frame}[fragile]
 \frametitle{Método}
 \framesubtitle{Muestra}
-<<echo=FALSE>>=
+<<echo=FALSE,warning=FALSE,message=FALSE>>=
 # Carga de datos
 datosr2 <- read.csv("ESS11 depurada.csv", header = TRUE, sep = ",", dec = ".")
 
@@ -179,18 +179,18 @@ Total & 17171 \\
 \section{Resultados}
 \subsection{Género}
 \begin{frame}
-\frametitle{Resutados}
+\frametitle{Resultados}
 \framesubtitle{Género y uso de medios}
-<<echo=FALSE>>=
+<<echo=FALSE,warning=FALSE,message=FALSE>>=
 #Comparación
 gnoticias <- wilcox.test(nwspol~gndr, datosr2)
 gfreci <- wilcox.test(netusoft~gndr, datosr2)
 gtinternet <- wilcox.test(netustm~gndr, datosr2)
 @
 
-Hay diferencias significativas según el género en el tiempo medio dedicado a las noticias y la política (\emph{U} = \Sexpr{round(gnoticias$statistic, 2)}, \emph{p} = \Sexpr{round(gnoticias$p.value, 3)}) y el tiempo de uso de Internet (\emph{U} = \Sexpr{round(gtinternet$statistic, 2)}, \emph{p} = \Sexpr{round(gtinternet$p.value, 3)}).
+Hay diferencias significativas según el género en el tiempo medio dedicado a las noticias y la política (\emph{U} = \Sexpr{format(gnoticias$statistic, scientific = F)}, \emph{p} = \Sexpr{round(gnoticias$p.value, 3)}) y el tiempo de uso de Internet (\emph{U} = \Sexpr{format(gtinternet$statistic, scientific = F)}, \emph{p} = \Sexpr{round(gtinternet$p.value, 3)}).
 
-<<echo=FALSE>>=
+<<echo=FALSE,warning=FALSE,message=FALSE>>=
 #Medias
 gdes <-summaryBy(nwspol+netusoft+netustm ~ gndr,data=datosr2,FUN=c(mean,sd))
 gdes[,-c(1)] <- round(gdes[,-c(1)],2) 
@@ -214,13 +214,13 @@ Varón & 99.31 & 4.91 & 242.22 \\
 
 \subsection{Edad}
 \begin{frame}
-\frametitle{Resutados}
+\frametitle{Resultados}
 \framesubtitle{Edad y uso de medios}
 
 \begin{figure}[ht]
 \centering
 \caption{\scriptsize Correlograma de la edad con el uso de medios}
-<<echo=FALSE,fig=true,width=1.2,height=0.87>>=
+<<echo=FALSE,warning=FALSE,message=FALSE,fig=TRUE,fig.width=2.5,fig.height=2.5>>=
 #Correlaciones
 coredad <- rcorr(as.matrix(datosr2[,c(1,5:7)]), type = "spearman")
 
@@ -233,35 +233,35 @@ corrplot(coredad$r, method="ellipse", col=colorRampPalette(c("dodgerblue3","whit
          addCoef.col = "black", # Add coefficient of correlation
          tl.col="black", tl.srt=45, #Text label color and rotation
          # hide correlation coefficient on the principal diagonal
-         cl.cex = 0.17, # Ajustar tamaño de las etiquetas de la leyenda
-         number.cex = 0.2, # Ajustar tamaño de los coeficientes
-         tl.cex = 0.17, # Ajustar tamaño de las etiquetas de las variable
+         cl.cex = 0.3, # Ajustar tamaño de las etiquetas de la leyenda
+         number.cex = 0.65, # Ajustar tamaño de los coeficientes
+         tl.cex = 0.4, # Ajustar tamaño de las etiquetas de las variable
          diag=F,mar = c(0, 0, 0, 0))
 @
 \end{figure}
 \end{frame}
 
 \begin{frame}
-\frametitle{Resutados}
+\frametitle{Resultados}
 \framesubtitle{Edad y uso de medios}
 \begin{figure}[ht]
 \centering
 \caption{\scriptsize Diagrama de dispersión edad - tiempo de uso de Internet}
-<<echo=FALSE,fig=true,width=0.7,height=0.6>>=
+<<echo=FALSE,warning=FALSE,message=FALSE,fig=TRUE,fig.width=2.5,fig.height=2.5>>=
 ggplot(datosr2, aes(x = agea, y = netustm, color = agea)) +
-  geom_point(size = 0.0001, alpha = 0.8, shape = 20) +  # Capa de puntos con tamaño personalizado
-  geom_smooth(method = "lm", se = FALSE, color = "blue", linewidth = 0.1) +  # Línea de regresión lineal sin intervalo de confianza
+  geom_point(size = 1, alpha = 0.8, shape = 20) +  # Capa de puntos con tamaño personalizado
+  geom_smooth(method = "lm", se = FALSE, color = "blue", linewidth = 0.5) +  # Línea de regresión lineal sin intervalo de confianza
   labs(x = "Edad", y = "Tiempo de uso de internet") +
-  scale_color_viridis_c(option = "magma") +  # Escala de color (puedes cambiar a la que prefieras)
+  scale_color_viridis_c(option = "magma") +  # Escala de color
   theme_minimal() +  # Estilo del tema minimalista
   theme(
     panel.grid.major = element_blank(),  # Eliminar líneas de la cuadrícula principal
     panel.grid.minor = element_blank(),  # Eliminar líneas de la cuadrícula secundaria
     axis.line = element_line(color = "black", , linewidth = 0.05),  # Líneas de los ejes en negro
     axis.ticks = element_line(color = "black", linewidth = 0.05),  # Color de las marcas de los ejes
-    axis.ticks.length = unit(0.2, "mm"),  # Longitud de las marcas de los ejes
-    axis.title = element_text(size = 1.25),  # Tamaño de las etiquetas de los ejes
-    axis.text = element_text(size = 1),  # Tamaño del texto de los ejes
+    axis.ticks.length = unit(0.1, "cm"),  # Longitud de las marcas de los ejes
+    axis.title = element_text(size = 7),  # Tamaño de las etiquetas de los ejes
+    axis.text = element_text(size = 4),  # Tamaño del texto de los ejes
     legend.position = "none"
   )
 @
@@ -270,12 +270,12 @@ ggplot(datosr2, aes(x = agea, y = netustm, color = agea)) +
 
 \subsection{Años de educación}
 \begin{frame}
-\frametitle{Resutados}
+\frametitle{Resultados}
 \framesubtitle{Años de educación y uso de medios}
 \begin{figure}[ht]
 \centering
 \caption{\scriptsize Correlograma de los años de educación con el uso de medios}
-<<echo=FALSE,fig=true,width=1.2,height=0.87>>=
+<<echo=FALSE,warning=FALSE,message=FALSE,fig=TRUE,fig.width=2.5,fig.height=2.5>>=
 #Correlaciones
 coredu <- rcorr(as.matrix(datosr2[,c(3,5:7)]), type = "spearman")
 
@@ -288,35 +288,35 @@ corrplot(coredu$r, method="ellipse", col=colorRampPalette(c("dodgerblue3","white
          addCoef.col = "black", # Add coefficient of correlation
          tl.col="black", tl.srt=45, #Text label color and rotation
          # hide correlation coefficient on the principal diagonal
-         cl.cex = 0.17, # Ajustar tamaño de las etiquetas de la leyenda
-         number.cex = 0.25, # Ajustar tamaño de los coeficientes
-         tl.cex = 0.17, # Ajustar tamaño de las etiquetas de las variable
+         cl.cex = 0.3, # Ajustar tamaño de las etiquetas de la leyenda
+         number.cex = 0.65, # Ajustar tamaño de los coeficientes
+         tl.cex = 0.4, # Ajustar tamaño de las etiquetas de las variable
          diag=F,mar = c(0, 0, 0, 0))
 @
 \end{figure}
 \end{frame}
 
 \begin{frame}
-\frametitle{Resutados}
+\frametitle{Resultados}
 \framesubtitle{Años de educación y uso de medios}
 \begin{figure}[ht]
 \centering
 \caption{\scriptsize Diagrama de dispersión años de educación - tiempo de uso de Internet}
-<<echo=FALSE,fig=true,width=0.7,height=0.6>>=
+<<echo=FALSE,warning=FALSE,message=FALSE,fig=TRUE,fig.width=2.5,fig.height=2.5>>=
 ggplot(datosr2, aes(x = eduyrs, y = netustm, color = eduyrs)) +
-  geom_point(size = 0.0001, alpha = 0.8, shape = 20) +  # Capa de puntos con tamaño personalizado
-  geom_smooth(method = "lm", se = FALSE, color = "blue", linewidth = 0.1) +  # Línea de regresión lineal sin intervalo de confianza
+  geom_point(size = 1, alpha = 0.8, shape = 20) +  # Capa de puntos con tamaño personalizado
+  geom_smooth(method = "lm", se = FALSE, color = "blue", linewidth = 0.5) +  # Línea de regresión lineal sin intervalo de confianza
   labs(x = "Años de educación", y = "Tiempo de uso de internet") +
-  scale_color_viridis_c(option = "magma") +  # Escala de color (puedes cambiar a la que prefieras)
+  scale_color_viridis_c(option = "magma") +  # Escala de color
   theme_minimal() +  # Estilo del tema minimalista
   theme(
     panel.grid.major = element_blank(),  # Eliminar líneas de la cuadrícula principal
     panel.grid.minor = element_blank(),  # Eliminar líneas de la cuadrícula secundaria
     axis.line = element_line(color = "black", , linewidth = 0.05),  # Líneas de los ejes en negro
     axis.ticks = element_line(color = "black", linewidth = 0.05),  # Color de las marcas de los ejes
-    axis.ticks.length = unit(0.2, "mm"),  # Longitud de las marcas de los ejes
-    axis.title = element_text(size = 1.25),  # Tamaño de las etiquetas de los ejes
-    axis.text = element_text(size = 1),  # Tamaño del texto de los ejes
+    axis.ticks.length = unit(0.1, "cm"),  # Longitud de las marcas de los ejes
+    axis.title = element_text(size = 7),  # Tamaño de las etiquetas de los ejes
+    axis.text = element_text(size = 4),  # Tamaño del texto de los ejes
     legend.position = "none"
   )
 @
@@ -325,9 +325,9 @@ ggplot(datosr2, aes(x = eduyrs, y = netustm, color = eduyrs)) +
 
 \subsection{País}
 \begin{frame}
-\frametitle{Resutados}
+\frametitle{Resultados}
 \framesubtitle{País y uso de medios}
-<<echo=FALSE>>=
+<<echo=FALSE,warning=FALSE,message=FALSE>>=
 #Comparación
 pnoticias <- kruskal.test(nwspol~cntry, datosr2)
 pfreci <- kruskal.test(netusoft~cntry, datosr2)
@@ -336,7 +336,7 @@ ptinternet <- kruskal.test(netustm~cntry, datosr2)
 
 Hay diferencias en el tiempo medio que dedican los distintos países a las noticias y la política (\emph{KW} = \Sexpr{round(pnoticias$statistic, 2)}, \emph{p} = \Sexpr{round(pnoticias$p.value, 3)}), así como en el tiempo (\emph{KW} = \Sexpr{round(ptinternet$statistic, 2)}, \emph{p} = \Sexpr{round(ptinternet$p.value, 3)}) y la frecuencia de uso de Internet (\emph{KW} = \Sexpr{round(pfreci$statistic, 2)}, \emph{p} = \Sexpr{round(pfreci$p.value, 3)}).
 
-<<echo=FALSE>>=
+<<echo=FALSE,warning=FALSE,message=FALSE>>=
 #Medias
 pdes <-summaryBy(nwspol+netusoft+netustm ~ cntry,data=datosr2, FUN=c(mean,sd))
 pdes[,-c(1)] <- round(pdes[,-c(1)],2) 
