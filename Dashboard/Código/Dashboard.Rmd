@@ -1,0 +1,532 @@
+---
+title: "Dashboard sobre uso de medios de la ESS 11"
+author: María Solar Sastre
+output: 
+  flexdashboard::flex_dashboard:
+    theme: 
+      bg: "#FBFCFC"
+      fg: "#212F3D" 
+      primary: "#D1F2EB"
+      base_font: !expr bslib::font_google("Prompt")
+      code_font: !expr bslib::font_google("JetBrains Mono")
+    orientation: rows
+    vertical_layout: fill
+    social: menu
+    source_code: embed
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+# Carga de paquetes
+if(!require(flexdashboard)) {install.packages("flexdashboard")
+  library(flexdashboard)}
+if(!require(knitr)) {install.packages("knitr")
+  library(knitr)}
+if(!require(dplyr)) {install.packages("dplyr")
+  library(dplyr)}
+if(!require(ggplot2)) {install.packages("ggplot2")
+  library(ggplot2)}
+if(!require(plotly)) {install.packages("plotly")
+  library(plotly)}
+if(!require(shiny)) {install.packages("shiny")
+  library(shiny)}
+if(!require(DT)) {install.packages("DT")
+  library(DT)}
+if(!require(doBy)) {install.packages("doBy")
+  library(doBy)}
+if(!require(viridis)) {install.packages("viridis")
+  library(viridis)}
+```
+
+```{r}
+#Carga de datos
+datosr2 <- read.csv("ESS11 depurada.csv", header = TRUE, sep = ",", dec = ".")
+```
+
+Género {data-icon="fa-venus-mars"}
+===================
+
+Row
+-----------------------------------------------------------------------
+
+### Tiempo dedicado a noticias
+
+```{r}
+pgn <- ggplot(datosr2, aes(x = factor(gndr), y = nwspol, fill = factor(gndr))) +
+  geom_violin(trim = FALSE) +  # Capa de violín sin recorte
+  stat_summary(fun = mean, geom = "point", size = 3, color = "black", shape = 18, fill = "black") +
+  labs(x = "Género", y = "Minutos") + 
+  scale_fill_manual(values = c("plum2", "skyblue")) +
+  theme(legend.position = "none")
+
+pgn_interactivo <- ggplotly(pgn) %>%
+  layout(hovermode = "closest" )
+
+pgn_interactivo
+```
+
+### Frecuencia de uso de Internet
+
+```{r}
+pgf <- ggplot(datosr2, aes(x = factor(gndr), y = netusoft, fill = factor(gndr))) +
+  geom_violin(trim = FALSE) +  # Capa de violín sin recorte
+  stat_summary(fun = mean, geom = "point", size = 3, color = "black", shape = 18, fill = "black") +
+  labs(x = "Género", y = "Frecuencia") + 
+  scale_y_continuous(breaks = c(1,2,3,4,5)) +
+  scale_fill_manual(values = c("plum2", "skyblue")) +
+  theme(legend.position = "none")
+
+pgf_interactivo <- ggplotly(pgf) %>%
+  layout(hovermode = "closest" )
+
+pgf_interactivo
+```
+
+### Tiempo de uso de Internet
+
+```{r}
+pgt <- ggplot(datosr2, aes(x = factor(gndr), y = netustm, fill = factor(gndr))) +
+  geom_violin(trim = FALSE) +  # Capa de violín sin recorte
+  stat_summary(fun = mean, geom = "point", size = 3, color = "black", shape = 18, fill = "black") +
+  labs(x = "Género", y = "Minutos") + 
+  scale_fill_manual(values = c("plum2", "skyblue")) +
+  theme(legend.position = "none")
+
+pgt_interactivo <- ggplotly(pgn) %>%
+  layout(hovermode = "closest" )
+
+pgn_interactivo
+```
+
+Row {.sidebar}
+-----------------------------------------------------------------------
+
+```{r}
+selectInput("gender", label="Selecciona el género:", choices = c("Todos", unique(datosr2$gndr)), selected = "Todos")
+
+género <- c("Todos", unique(datosr2$gndr))
+
+coloresg <- c("green", "skyblue", "plum")
+
+colorsg <- setNames(coloresg, género)
+```
+
+Row {data-height="170"}
+-----------------------------------------------------------------------
+
+### Media minutos dedicados a noticias en género = `r reactive(input$gender)`
+
+```{r}
+renderPlotly({
+  req(input$gender)
+  
+  selected_gender <- input$gender
+  if (selected_gender == "Todos") {
+    filtered_data <- datosr2
+  } else {
+    filtered_data <- datosr2 %>% filter(gndr == selected_gender)
+  }
+  mean_nwspol <- mean(filtered_data$nwspol, na.rm = TRUE)
+  gauge_color <- colorsg[selected_gender]
+
+  plot_ly(
+    type = "indicator",
+    mode = "gauge+number",
+    value = mean_nwspol,
+    gauge = list(
+      axis = list(range = list(0, 1500)),
+      bar = list(color = gauge_color)
+    )
+  ) %>% layout(margin = list(l = 10, r = 10, t = 45, b = 40))
+})
+```
+
+### Media frecuencia de uso Internet en género = `r reactive(input$gender)`
+
+```{r}
+renderPlotly({
+  req(input$gender)
+  selected_gender <- input$gender
+  if (selected_gender == "Todos") {
+    filtered_data <- datosr2
+  } else {
+    filtered_data <- datosr2 %>% filter(gndr == selected_gender)
+  }
+  mean_netusoft <- mean(filtered_data$netusoft, na.rm = TRUE)
+  gauge_color <- colorsg[selected_gender]
+
+  plot_ly(
+    type = "indicator",
+    mode = "gauge+number",
+    value = mean_netusoft,
+    gauge = list(
+      axis = list(range = list(1, max(datosr2$netusoft, na.rm = TRUE))),
+      bar = list(color = gauge_color)
+    )
+  ) %>% layout(margin = list(l = 10, r = 10, t = 45, b = 40))
+})
+```
+
+### Media minutos de uso de Internet en género = `r reactive(input$gender)`
+
+```{r}
+renderPlotly({
+  req(input$gender)
+  selected_gender <- input$gender
+  if (selected_gender == "Todos") {
+    filtered_data <- datosr2
+  } else {
+    filtered_data <- datosr2 %>% filter(gndr == selected_gender)
+  }
+  mean_netustm <- mean(filtered_data$netustm, na.rm = TRUE)
+  gauge_color <- colorsg[selected_gender]
+
+  plot_ly(
+    type = "indicator",
+    mode = "gauge+number",
+    value = mean_netustm,
+    gauge = list(
+      axis = list(range = list(0, 1500)),
+      bar = list(color = gauge_color)
+    )
+  ) %>% layout(margin = list(l = 10, r = 10, t = 45, b = 40))
+})
+```
+
+Edad {data-icon="fa-user"}
+===================
+
+### Uso de medios por edad
+
+```{r}
+# Interfaz de usuario
+ui <- fluidPage(
+  sidebarLayout(
+    sidebarPanel(
+      selectInput("variable", label = "Selecciona la variable para mostrar:", 
+                  choices = c("Tiempo dedicado a noticias" = "nwspol", 
+                              "Frecuencia de uso de Internet" = "netusoft", 
+                              "Tiempo de uso de Internet" = "netustm")), width = "500px" 
+    ),
+    mainPanel(
+      plotlyOutput("grafico_dispersion", height = "550px")
+    )
+  )
+)
+
+# Lógica del servidor
+server <- function(input, output) {
+  output$grafico_dispersion <- renderPlotly({
+    req(input$variable)
+    
+    selected_variable <- input$variable
+    
+    if (selected_variable == "netusoft") {
+      
+    plot <- ggplot(datosr2, aes(x = factor(.data[[selected_variable]]), y = agea,
+                                fill = factor(.data[[selected_variable]]))) +
+      geom_violin(trim = FALSE) +  # Capa de violín
+      stat_summary(fun = mean, geom = "point", size = 3, color = "black", shape = 18, fill = "black") +
+      labs(x = selected_variable, y = "Edad", title = paste("Distribución de edad por", selected_variable)) +  
+      scale_fill_manual(values = c("#EFF3FF", "#BDD7E7", "#6BAED6", "#3182BD", "#08519C")) +
+      theme(legend.position = "none") +
+      scale_y_continuous(limits = c(10, 90), n.breaks = 10) +
+      coord_flip()  # Girar coordenadas para mejor visualización
+      
+      } else {
+    plot <- ggplot(datosr2, aes(x = agea, y = .data[[selected_variable]], color = agea)) +
+      geom_point(size = 1.5) +  # Capa de puntos con tamaño personalizado
+      geom_smooth(method = "lm", se = FALSE, color = "blue") +  # Línea de regresión lineal sin intervalo de confianza
+      labs(x = "Edad", y = selected_variable,  # Etiquetas de los ejes
+           title = paste("Relación entre edad y", selected_variable),
+           color = "Edad") +
+      scale_x_continuous(limits = c(10,90), n.breaks = 10) +
+      scale_color_viridis_c(option = "magma") +
+      theme(legend.position = "none")
+  }
+    ggplotly(plot)
+  })
+}
+
+shinyApp(ui = ui, server = server)
+```
+
+### Descriptivos de uso de medios por edad
+
+```{r}
+mediasedad <- summaryBy(nwspol+netusoft+netustm~agea, data = datosr2, FUN = c(mean,sd))
+mediase <- mediasedad %>% select(agea, nwspol.mean, nwspol.sd, netusoft.mean, netusoft.sd, netustm.mean, netustm.sd)
+mediase <- round(mediase, 3)
+colnames(mediase) <- c("Edad", "Minutos noticias (Media)", "Minutos noticias (Dt)", "Frecuencia Internet (Media)", "Frecuencia Internet (Dt)", "Minutos Internet (Media)", "Minutos Internet (Dt)")
+datatable(mediase, filter = "top")
+```
+
+Años de educación {data-icon="fa-user-graduate"}
+===================
+
+### Uso de medios por años de educación
+
+```{r}
+# Interfaz de usuario
+ui <- fluidPage(
+  sidebarLayout(
+    sidebarPanel(
+      selectInput("variable", label = "Selecciona la variable para mostrar:", 
+                  choices = c("Tiempo dedicado a noticias" = "nwspol", 
+                              "Frecuencia de uso de Internet" = "netusoft", 
+                              "Tiempo de uso de Internet" = "netustm")), width = "500px" 
+    ),
+    mainPanel(
+      plotlyOutput("grafico_dispersion", height = "550px")
+    )
+  )
+)
+
+# Lógica del servidor
+server <- function(input, output) {
+  output$grafico_dispersion <- renderPlotly({
+    req(input$variable)
+    
+    selected_variable <- input$variable
+    
+    if (selected_variable == "netusoft") {
+      
+    plot <- ggplot(datosr2, aes(x = factor(.data[[selected_variable]]), y = eduyrs,
+                                fill = factor(.data[[selected_variable]]))) +
+      geom_violin(trim = FALSE) +  # Capa de violín
+      stat_summary(fun = mean, geom = "point", size = 3, color = "black", shape = 18, fill = "black") +
+      labs(x = selected_variable, y = "Años de educación",
+           title = paste("Distribución de años de educación por", selected_variable)) +  
+      scale_fill_manual(values = c("#EFF3FF", "#BDD7E7", "#6BAED6", "#3182BD", "#08519C")) +
+      theme(legend.position = "none") +
+      scale_y_continuous(limits = c(0, 50), n.breaks = 5) +
+      coord_flip()  # Girar coordenadas para mejor visualización
+      
+      } else {
+    plot <- ggplot(datosr2, aes(x = eduyrs, y = .data[[selected_variable]], color = eduyrs)) +
+      geom_point(size = 1.5) +  # Capa de puntos con tamaño personalizado
+      geom_smooth(method = "lm", se = FALSE, color = "blue") +  # Línea de regresión lineal sin intervalo de confianza
+      labs(x = "Años de educación", y = selected_variable,  # Etiquetas de los ejes
+           title = paste("Relación entre años de educación y", selected_variable),
+           color = "Edad") +
+      scale_x_continuous(limits = c(0,50), n.breaks = 5) +
+      scale_color_viridis_c(option = "magma") +
+      theme(legend.position = "none")
+  }
+    ggplotly(plot)
+  })
+}
+
+shinyApp(ui = ui, server = server)
+```
+
+### Descriptivos de uso de medios por años de educación
+
+```{r}
+mediaseducacion<- summaryBy(nwspol+netusoft+netustm~eduyrs, data = datosr2, FUN = c(mean,sd))
+mediasedu <- mediaseducacion %>% select(eduyrs, nwspol.mean, nwspol.sd, netusoft.mean, netusoft.sd, netustm.mean, netustm.sd)
+mediasedu <- round(mediasedu, 3)
+colnames(mediasedu) <- c("Años de educación", "Minutos noticias (Media)", "Minutos noticias (Dt)", "Frecuencia Internet (Media)", "Frecuencia Internet (Dt)", "Minutos Internet (Media)", "Minutos Internet (Dt)")
+datatable(mediasedu, filter = "top")
+```
+
+País {data-icon="fa-globe"}
+===================
+
+Row
+-----------------------------------------------------------------------
+
+### Uso de medios por país
+
+```{r}
+#Interfaz de usuario
+ui <- fluidPage(
+  sidebarLayout(
+    sidebarPanel(
+      selectInput("variable", label="Selecciona la variable para mostrar:", 
+                  choices = c("Tiempo dedicado a noticias" = "nwspol", 
+                              "Frecuencia de uso de Internet" = "netusoft", 
+                              "Tiempo de uso de Internet" = "netustm")),
+      selectInput("cntry", label="Selecciona o borra los países para mostrar:", 
+                  choices = unique(datosr2$cntry),
+                  selected = unique(datosr2$cntry),  # Selecciona todos por defecto
+                  multiple = TRUE)
+    ),
+    mainPanel(
+      plotlyOutput("grafico_violin", height = "500px")
+    )
+  )
+)
+
+# Lógica del servidor
+server <- function(input, output) {
+  output$grafico_violin <- renderPlotly({
+    req(input$variable)
+    req(input$cntry)
+    
+    selected_variable <- input$variable
+    selected_cntries <- input$cntry
+    
+    filtered_data <- datosr2 %>% filter(cntry %in% selected_cntries)
+    
+    ppf <- ggplot(filtered_data, aes(x = factor(cntry), y = .data[[selected_variable]], fill = factor(cntry))) +
+      geom_violin(trim = FALSE) +  # Capa de violín sin recorte
+      stat_summary(fun = mean, geom = "point", size = 3, color = "black", shape = 18, fill = "black") +
+      labs(x = "País", y = selected_variable, title = paste("Distribución de", selected_variable, "por países")) +
+      scale_fill_manual(values = c("#FF9999", "#66B2FF", "grey", "orange", "#FF99CC", 
+                                    "#CC99FF", "#FF6666", "#99CCCC", "#CCFF99", "#CCCCFF", 
+                                    "yellow", "#FF66B2", "#66FF66")) +
+      theme(legend.position = "none")
+
+    ggplotly(ppf)
+  })
+}
+
+shinyApp(ui = ui, server = server)
+```
+
+Row {.sidebar}
+-----------------------------------------------------------------------
+
+```{r}
+selectInput("country", label="Selecciona el país:", choices = c("Todos", unique(datosr2$cntry)), selected = "Todos")
+
+countries <- unique(datosr2$cntry); countries <- sort(countries)
+paises <- c("Todos", countries)
+
+coloresp <- c("green", "#FF9999", "#66B2FF", "grey", "orange", "#FF99CC", 
+             "#CC99FF", "#FF6666", "#99CCCC", "#CCFF99", "#CCCCFF", 
+             "yellow", "#FF66B2", "#66FF66")
+
+colorsp <- setNames(coloresp, paises)
+```
+
+Row {data-height="170"}
+-----------------------------------------------------------------------
+
+### Media minutos dedicados a noticias en país = `r reactive(input$country)`
+
+```{r}
+renderPlotly({
+  req(input$country)
+  selected_country <- input$country
+  if (selected_country == "Todos") {
+    filtered_data <- datosr2
+  } else {
+    filtered_data <- datosr2 %>% filter(cntry == selected_country)
+  }
+
+  mean_nwspol <- mean(filtered_data$nwspol, na.rm = TRUE)
+  gauge_color <- colorsp[selected_country]
+
+  plot_ly(
+    type = "indicator",
+    mode = "gauge+number",
+    value = mean_nwspol,
+    gauge = list(
+      axis = list(range = list(0, 1500)),
+      bar = list(color = gauge_color)
+    )
+  ) %>% layout(margin = list(l = 10, r = 10, t = 45, b = 40))
+})
+```
+
+### Media frecuencia de uso Internet en país = `r reactive(input$country)`
+
+```{r}
+renderPlotly({
+  req(input$country)
+  selected_country <- input$country
+  if (selected_country == "Todos") {
+    filtered_data <- datosr2
+  } else {
+    filtered_data <- datosr2 %>% filter(cntry == selected_country)
+  }
+  mean_netusoft <- mean(filtered_data$netusoft, na.rm = TRUE)
+  gauge_color <- colorsp[selected_country]
+
+  plot_ly(
+    type = "indicator",
+    mode = "gauge+number",
+    value = mean_netusoft,
+    gauge = list(
+      axis = list(range = list(1, max(datosr2$netusoft, na.rm = TRUE))),
+      bar = list(color = gauge_color)
+    )
+  ) %>% layout(margin = list(l = 10, r = 10, t = 45, b = 40))
+})
+```
+
+### Media minutos de uso de Internet en país = `r reactive(input$country)`
+
+```{r}
+renderPlotly({
+  req(input$country)
+  selected_country <- input$country
+  if (selected_country == "Todos") {
+    filtered_data <- datosr2
+  } else {
+    filtered_data <- datosr2 %>% filter(cntry == selected_country)
+  }
+  mean_netustm <- mean(filtered_data$netustm, na.rm = TRUE)
+  gauge_color <- colorsp[selected_country]
+
+  plot_ly(
+    type = "indicator",
+    mode = "gauge+number",
+    value = mean_netustm,
+    gauge = list(
+      axis = list(range = list(0, 1500)),
+      bar = list(color = gauge_color)
+    )
+  ) %>% layout(margin = list(l = 10, r = 10, t = 45, b = 40))
+})
+```
+
+Información del proyecto {data-icon="fa-info"}
+===================
+
+Column
+-----------------------------------------------------------------------
+
+### **Encuesta Social Europea**
+
+El presente proyecto trabajará con la base de datos de la **11.ª oleada de la Encuesta Social Europea** (ESS round 11 - 2023. Social inequalities in health, Gender in contemporary Europe). La Encuesta Social Europea es un proyecto de investigación paneuropeo cuyo objetivo es recopilar datos sobre las actitudes, creencias y comportamientos de la población en Europa. Se distingue por su rigor metodológico y la calidad de sus datos, que se obtienen mediante encuestas bien diseñadas y representativas de la población adulta de cada país participante (en esta oleada, hay recogidos datos de 13 países). La documentación sobre el conjunto de datos (alcance, fecha, licencia, etc.) se puede consultar [aquí](https://ess.sikt.no/en/study/412db4fe-c77a-4e98-8ea4-6c19007f551b/83).
+
+Este conjunto de datos incluye un total de 558 variables que abarcan diferentes aspectos sociales, las cuales se agrupan en diferentes bloques de contenido (demografía, bienestar, política, religión, sociedad, medios de comunicación, etc.). La relación completa de variables incluidas en el conjunto, junto con su descripción y valores, se puede consultar [aquí](https://ess.sikt.no/en/datafile/242aaa39-3bbb-40f5-98bf-bfb1ce53d8ef/93?tab=0)
+
+Column
+-----------------------------------------------------------------------
+
+### **Objetivos del proyecto**
+
+El objetivo general del presente proyecto de ciencia de datos comportamentales es examinar **las relaciones entre variables demográficas (edad, género, años de educación formal y país) y el comportamiento relacionado con el uso de medios (tiempo dedicado a las noticias y política, frecuencia de uso de Internet y tiempo de uso de Internet)**, para comprender mejor el comportamiento de los usuarios de medios digitales y de comunicación en función de sus características demográficas.
+
+De forma más específica, los objetivos concretos del proyecto son los siguientes:
+
+* Estudiar las posibles diferencias en el uso de medios en función del género.
+* Comprobar si existe una relación entre la edad y el tiempo y frecuencia de uso de medios.
+* Estudiar la posible relación entre los años de educación formal completados y el uso de medios.
+* Examinar si hay diferencias en el tiempo y frecuencia de uso de medios en distintos países europeos.
+
+Column
+-----------------------------------------------------------------------
+
+### **Variables**
+
+Las variables incluidas en este proyecto han sido las siete siguientes:
+
+* **Edad (*agea*):** esta variable numérica se refiere a la edad de la persona encuestada, expresada en años, con un rango de valores desde 15 hasta 90 años.
+
+* **Género (*gndr*):** esta variable se refiere al género de la persona encuestada. Es un dato de tipo categórico nominal y su codificación numérica abarca dos valores: 1 (Varón) y 2 (Mujer).
+
+* **Años de educación completados (*eduyrs*):** esta variable numérica se refiere al número de años de educación formal que ha completado la persona encuestada, con un rango de valores desde 0 hasta 47 años.
+
+* **País (*cntry*):** esta variable se refiere al país de origen de la persona encuestada. Es un dato de tipo categórico nominal y abarca 13 valores de tipo carácter: AT (Austria), CH (Suiza), DE (Alemania), FI (Finlandia), GB (Reino Unido), HR (Croacia), HU (Hungría), IE (Irlanda), LT (Lituania), NL (Países Bajos), NO (Noruega), SI (Eslovenia) y SK (Eslovaquia).
+
+* **Tiempo dedicado a las noticias y la política (*nwspol*):** esta variable numérica se refiere al tiempo que dedica la persona encuestada a ver, leer o escuchar noticias sobre la actualidad o la política en un día, expresado en minutos, con un rango de valores desde 0 hasta 1439 minutos.
+
+* **Frecuencia de uso de internet (*netusoft*):** esta variable se refiere a la frecuencia habitual con que la persona encuestada utiliza Internet. Es un dato de tipo categórico ordinal y abarca 5 valores, en una escala ordinal de frecuencia, que va desde 1 (Nunca) hasta 5 (Todos los días).
+
+* **Tiempo de uso de Internet (*netustm*):** esta variable numérica se refiere al tiempo que dedica la persona encuestada al uso de Internet en un día, expresado en minutos, con un rango de valores desde 0 hasta 1440 minutos.
+
