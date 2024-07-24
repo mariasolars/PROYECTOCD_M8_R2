@@ -41,7 +41,7 @@ Este repositorio se organiza del siguiente modo:
 
 * **Datos:** contiene la base de datos original (ESS11.csv), así como la base de datos depurada (ESS11 depurada.csv) y el código para llevar a cabo la depuración de la base original.
 
-* **Dashboard:** contiene el código necesario para realizar un *dashboard* con la visualización de los gráficos y datos para estudiar las relaciones entre las variables, así como el HTML con el *dashboard* generado con dicho código.
+* **Dashboard:** contiene el código necesario para realizar un *dashboard* con la visualización de los gráficos y tablas para estudiar las relaciones entre las variables, el cual abrirá una ventana emergente al ejecutarse que permitirá visualizar el *dashboard*.
 
 * **Informe:** contiene el código necesario para realizar un informe con los resultados de las relaciones entre las variables estudiadas en el proyecto, así como el PDF del informe generado con dicho código.
 
