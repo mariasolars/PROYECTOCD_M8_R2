@@ -1,0 +1,59 @@
+---
+title: "Presentation"
+author: "DW"
+date: "2024-07-28"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(readr)
+library(dplyr)
+library(knitr)
+library(kableExtra)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.width=8, fig.height=8)
+
+# Establecer el directorio de trabajo
+file_path <- here::here('Datos','bd_depurada.csv')
+
+# Cargar datos
+data <- read_csv(file_path)
+
+# Convertir la variable de participación en un factor
+data$Votó_en_la_última_elección_nacional <- as.factor(data$Votó_en_la_última_elección_nacional)
+
+# Calcular la proporción de votantes por nivel de confianza en políticos
+proporcion_voto <- data %>%
+  group_by(Confianza_politicos, Votó_en_la_última_elección_nacional) %>%
+  summarize(count = n()) %>%
+  mutate(proporcion = count / sum(count))
+```
+## Análisis de la Participación Electoral y la Confianza en Políticos
+
+En este análisis, examinamos la relación entre la participación en las elecciones y la confianza en los políticos. Utilizamos un gráfico de barras para visualizar cómo varía la participación electoral según diferentes niveles de confianza en los políticos.
+
+```{r fig=TRUE,fig.height=3.5,fig.width=6}
+# Crear el gráfico de barras
+grafico_barras <- ggplot(proporcion_voto, aes(x = as.factor(Confianza_politicos), y = proporcion, fill = Votó_en_la_última_elección_nacional)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Proporción de Participación en las Elecciones por Confianza en Políticos",
+       x = "Confianza en Políticos",
+       y = "Proporción de Participación",
+       fill = "Votó en la Última Elección") +
+  theme_minimal()
+
+# Mostrar el gráfico de barras
+print(grafico_barras)
+
+```
+
+## Resultados
+
+El gráfico de barras anterior muestra la distribución de la participación en las elecciones (sí, no, no elegible para votar) en relación con la confianza en los políticos. A partir de este gráfico, podemos observar lo siguiente:
+
+Alta confianza en políticos: Los encuestados con alta confianza en los políticos tienden a tener una mayor participación en las elecciones.
+Baja confianza en políticos: Los encuestados con baja confianza en los políticos muestran una menor participación en las elecciones.
+Patrón general: A medida que aumenta la confianza en los políticos, la participación en las elecciones también tiende a aumentar, aunque existen algunas excepciones y variabilidad.
+
+## Discusión
+Estos resultados sugieren que la confianza en los políticos puede ser un factor importante en la participación electoral. Los individuos que confían más en los políticos parecen estar más motivados para votar, posiblemente porque creen en la efectividad del sistema político y en que su voto puede tener un impacto positivo.
