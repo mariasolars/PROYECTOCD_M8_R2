@@ -1,0 +1,76 @@
+\documentclass{article}
+\usepackage{multicol}
+\usepackage{amsmath}
+\usepackage[spanish]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{
+  a4paper,
+  total={170mm,257mm},
+  left=20mm,
+  top=20mm,
+}
+
+\renewcommand{\refname}{Referencias}
+\renewcommand{\tablename}{Tabla}
+
+\title{Informe Técnico del Proyecto}
+\author{Daniela Wyndham}
+\date{\Sexpr{format(Sys.Date(), '%d de %B de %Y')}}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+\maketitle
+
+\section*{Antecedentes del estudio}
+Objetivo principal: Analizar variables relacionadas con la confianza en las instituciones políticas (confianza en los políticos, confianza en el parlamento y confianza en los partidos políticos) y cómo estas se relacionan con variables sociodemográficas y de participación en actividades políticas, como votar y participar en manifestaciones públicas.
+
+\section*{Tabla resumen}
+
+<<table-summary, echo=FALSE>>=
+# Cargar librerías
+library(knitr)
+library(dplyr)
+library(readr)
+
+# Cargar la base de datos
+# Reemplaza 'ruta_del_archivo' con la ruta a tu archivo CSV
+# Establecer el directorio de trabajo
+file_path <- here::here('Datos','bd_depurada.csv')
+
+# Cargar datos
+bd_depurada <- read_csv(file_path)
+
+# Calcular algunos indicadores resumen
+resumen <- bd_depurada %>%
+  summarise(
+    Total_Observaciones = n(),
+    Media_Edad = mean(Edad_del_encuestado_calculada, na.rm = TRUE),
+    Media_Interes_Politica = mean(Interés_en_la_política, na.rm = TRUE),
+    Media_Confianza_Politicos = mean(Confianza_politicos, na.rm = TRUE),
+    Media_Confianza_Parlamento = mean(Confianza_parlamento, na.rm = TRUE),
+    Desviacion_Estandar_Edad = sd(Edad_del_encuestado_calculada, na.rm = TRUE),
+    Desviacion_Estandar_Interes_Politica = sd(Interés_en_la_política, na.rm = TRUE),
+    Desviacion_Estandar_Confianza_Politicos = sd(Confianza_politicos, na.rm = TRUE),
+    Desviacion_Estandar_Confianza_Parlamento = sd(Confianza_parlamento, na.rm = TRUE)
+  )
+
+# Mostrar la tabla
+kable(resumen, caption = "Tabla resumen de algunos indicadores")
+@
+
+\section*{Gráfica}
+
+<<main-plot, echo=FALSE, fig.cap="Gráfico de resultados">>=
+library(ggplot2)
+
+# Crear un gráfico de ejemplo
+ggplot(bd_depurada, aes(x = Edad_del_encuestado_calculada, y = Interés_en_la_política)) +
+  geom_point() +
+  labs(title = "Relación entre Edad e Interés en la política",
+       x = "Edad del encuestado",
+       y = "Interés en la política")
+@
+
+\end{document}
+
